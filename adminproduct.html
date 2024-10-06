@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews</title>
+    <style>
+        table {
+            width: 50%;
+            border-collapse: collapse;
+            margin: 20px auto;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h2 style="text-align:center">User Reviews</h2>
+    <table id="reviewsTable">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Review</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Reviews will be injected here by JavaScript -->
+        </tbody>
+    </table>
+
+   
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    // Sample data in localStorage (In practice, ensure this is already stored)
+    localStorage.setItem('reviews', JSON.stringify([
+        {"username": "sathwik", "reviewText": "I really like your service"}
+    ]));
+
+    // Retrieve the reviews from local storage
+    const reviews = JSON.parse(localStorage.getItem('reviews')) || [];
+
+    // Reference to the table body where the reviews will be displayed
+    const reviewsTableBody = document.querySelector('#reviewsTable tbody');
+
+    // Generate table rows
+    reviews.forEach(review => {
+        const row = document.createElement('tr');
+        const usernameCell = document.createElement('td');
+        const reviewTextCell = document.createElement('td');
+
+        usernameCell.textContent = review.username;
+        reviewTextCell.textContent = review.reviewText;
+
+        row.appendChild(usernameCell);
+        row.appendChild(reviewTextCell);
+        reviewsTableBody.appendChild(row);
+    });
+});
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Review</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .product {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: #fff;
+        }
+        .product h3 {
+            margin: 0 0 10px;
+        }
+        .product p {
+            margin: 5px 0;
+        }
+        .review-section {
+            margin-top: 20px;
+        }
+        .feedback {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Your Purchased Products</h1>
+
+    <div class="purchasedItems">
+       
+        <tbody id="checkout-table-body">
+            <!-- Items will be populated here from local storage -->
+        </tbody>
+    </div>
+  
+
+    <!-- Review Section -->
+    <div class="review-section">
+        <h2>Write a Review</h2>
+        <textarea id="reviewText" rows="5" cols="50" placeholder="Write your review here..."></textarea><br><br>
+        <button onclick="submitReview()">Submit Review</button>
+    </div>
+
+    <!-- Feedback Message -->
+    <div class="feedback" id="feedbackMessage">
+        Thank you for your review! We appreciate your feedback.
+    </div>
+
+    <script>
+        function submitReview() {
+            var reviewText = document.getElementById('reviewText').value;
+            
+            if (reviewText.trim() === "") {
+                alert("Please write a review before submitting.");
+            } else {
+                document.getElementById('feedbackMessage').style.display = "block";
+                document.getElementById('reviewText').value = ""; // Clear the textarea
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+                const tableBody = document.getElementById('checkout-table-body');
+                const subtotalElement = document.getElementById('subtotal');
+                const totalElement = document.getElementById('total');
+                let subtotal = 0;
+    
+                // Retrieve cart items from local storage
+                const cartItems = JSON.parse(localStorage.getItem('items')) || [];
+                const barcodes = JSON.parse(localStorage.getItem('barcodes')) || [];
+                let count = 0;
+                cartItems.forEach(item => {
+                    const row = document.createElement('tr');
+    
+                    const productCell = document.createElement('td');
+                    productCell.textContent = item.name;
+                    row.appendChild(productCell);
+    
+                    const priceCell = document.createElement('td');
+                    priceCell.textContent = `${item.price}`;
+                    row.appendChild(priceCell);
+    
+                  
+                    const reviewCell = document.createElement('td');
+                    const reviewInput = document.createElement('textarea');
+                    reviewInput.classList.add('form-control');
+                    reviewInput.placeholder = 'Enter your review';
+                    reviewInput.value = localStorage.getItem(`${item.name}Review`) || '';
+                    reviewInput.addEventListener('input', function() {
+                        localStorage.setItem(`${item.name}Review`, this.value);
+                    });
+                    reviewCell.appendChild(reviewInput);
+                    row.appendChild(reviewCell);
+    
+                    tableBody.appendChild(row);
+    
+                   
+                });
+    
+                barcodes.forEach(barcode => {
+                    const row = document.createElement('tr');
+    
+                    const productCell = document.createElement('td');
+                    productCell.textContent = barcode.name;
+                    row.appendChild(productCell);
+    
+                    const priceCell = document.createElement('td');
+                    priceCell.textContent = `$${barcode.price}`;
+                    row.appendChild(priceCell);
+    
+                    const quantityCell = document.createElement('td');
+                    quantityCell.textContent = barcode.quantity;
+                    row.appendChild(quantityCell);
+    
+                    const totalCell = document.createElement('td');
+                    const total = barcode.price * barcode.quantity;
+                    totalCell.textContent = total;
+                    row.appendChild(totalCell);
+    
+                    tableBody.appendChild(row);
+    
+                    subtotal += total;
+                });
+    
+                subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
+                totalElement.textContent = `$${(subtotal + 10).toFixed(2)}`; // Assuming a flat shipping rate of $10
+            });
+    </script>
+
+</body>
+</html>

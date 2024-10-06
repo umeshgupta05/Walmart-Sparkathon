@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grocery Item Location Manager</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #444;
+            text-align: center;
+        }
+
+        .item-location {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        .item-location select, 
+        .item-location input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            flex: 1;
+        }
+
+        .item-location select {
+            max-width: 150px;
+        }
+
+        .item-location button {
+            background-color: #28a745;
+            color: #ffffff;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .item-location button:hover {
+            background-color: #218838;
+        }
+
+        .output-box {
+            margin-top: 30px;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .output-box h3 {
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .output-item {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .output-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        @media (max-width: 480px) {
+            .item-location {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .item-location select {
+                width: 100%;
+            }
+
+            .item-location button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Manage Grocery Item Locations</h2>
+        
+        <div id="input-container">
+            <div class="item-location">
+                <select class="grocery-item">
+                    <option value="Apples">Apples</option>
+                    <option value="Bananas">Bananas</option>
+                    <option value="Carrots">Carrots</option>
+                    <option value="Tomatoes">Tomatoes</option>
+                    <!-- Add more items as needed -->
+                </select>
+                <input type="text" class="location" placeholder="Enter location">
+                <button onclick="addItemLocation(this)">Add</button>
+            </div>
+        </div>
+
+        <div class="output-box" id="output-box">
+            <h3>Item Locations</h3>
+        </div>
+    </div>
+
+    <script>
+        function addItemLocation(button) {
+            // Get the parent div of the button (the .item-location div)
+            const itemLocationDiv = button.parentElement;
+            
+            // Get the selected item and entered location
+            const item = itemLocationDiv.querySelector('.grocery-item').value;
+            const location = itemLocationDiv.querySelector('.location').value;
+            
+            if(item && location) {
+                // Display the item-location pair in the output box
+                const outputBox = document.getElementById('output-box');
+                const outputItem = document.createElement('div');
+                outputItem.classList.add('output-item');
+                outputItem.textContent = `${item}: ${location}`;
+                outputBox.appendChild(outputItem);
+
+                // Clear the input field
+                itemLocationDiv.querySelector('.location').value = '';
+
+                // Add a new item-location input pair below the current one
+                const newDiv = itemLocationDiv.cloneNode(true);
+                newDiv.querySelector('.location').value = '';
+                document.getElementById('input-container').appendChild(newDiv);
+            } else {
+                alert("Please select an item and enter a location.");
+            }
+        }
+    </script>
+
+</body>
+</html>

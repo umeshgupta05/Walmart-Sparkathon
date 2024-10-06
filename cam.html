@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Access Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        video {
+            width: 80%;
+            height: auto;
+            border: 1px solid #ddd;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Camera Access Example</h1>
+    <video id="video" autoplay></video>
+    <br>
+    <button onclick="startCamera()">Start Camera</button>
+
+    <!-- Cart Table -->
+    <h2>Cart</h2>
+    <table id="cart">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Image</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Items will be added here -->
+        </tbody>
+    </table>
+
+    <!-- Include ZXing Library -->
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
+    <script>
+        async function startCamera() {
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+
+                // Filter video input devices (cameras)
+                const videoDevices = devices.filter(device => device.kind === 'videoinput');
+
+                if (videoDevices.length === 0) {
+                    alert("No camera found.");
+                    return;
+                }
+
+                // Try to find the rear camera first, otherwise use the first available camera
+                let rearCamera = videoDevices.find(device => device.label.toLowerCase().includes('back'));
+                let frontCamera = videoDevices.find(device => device.label.toLowerCase().includes('front'));
+                let selectedCamera = rearCamera || frontCamera || videoDevices[0];
+
+                // Request permission for the selected camera
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { deviceId: selectedCamera.deviceId } 
+                });
+
+                const video = document.getElementById('video');
+
+                // Stop any existing stream
+                if (video.srcObject) {
+                    video.srcObject.getTracks().forEach(track => track.stop());
+                }
+
+                // Set the new stream as the source for the video element
+                video.srcObject = stream;
+                video.play();
+
+                // Initialize barcode scanner after the camera is started
+                initializeBarcodeScanner(video);
+
+            } catch (error) {
+                console.log("Error accessing camera: ", error);
+                alert("Unable to access camera. Please check your permissions and try again.");
+            }
+        }
+
+        function initializeBarcodeScanner(videoElement) {
+            const codeReader = new ZXing.BrowserMultiFormatReader();
+            codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
+                if (result) {
+                    console.log("Barcode detected: ", result.text);
+                    storeBarcodeInLocalStorage(result.text);
+                }
+                if (err && !(err instanceof ZXing.NotFoundException)) {
+                    console.error("Error scanning barcode: ", err);
+                }
+            });
+        }
+
+        function storeBarcodeInLocalStorage(code) {
+            let items = [];
+
+            // Check if there are existing items in local storage
+            if (localStorage.getItem('items')) {
+                // Retrieve existing items from local storage
+                items = JSON.parse(localStorage.getItem('items'));
+            }
+
+            // Check if the item is already present in the array
+            const existingItem = items.find(item => item.code === code);
+            if (existingItem) {
+                console.log("Item already exists in the cart.");
+                return;
+            }
+
+            // Create a new item object
+            let newItem = { code: code, name: 'Oneplus Earpods', price: 4566, quantity: 1 };
+
+            // Add the new item to the array
+            items.push(newItem);
+            localStorage.setItem('items', JSON.stringify(items));
+
+            alert("Item added to cart.");
+        }
+    </script>
+</body>
+</html>
